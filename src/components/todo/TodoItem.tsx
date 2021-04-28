@@ -1,6 +1,5 @@
-import { Todo, todoState } from "atoms/todoState";
+import { Todo } from "atoms/todoState";
 import useTodo from "hooks/useTodo";
-import { useRecoilState } from "recoil";
 
 export interface TodoItemProps {
    item:Todo,
