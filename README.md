@@ -61,3 +61,43 @@ export const textLeanghState = selector({ // selector는 파생된 state를 나�
     }
 })
 ```
+
+#### hook (src/hooks/useTextInputState.ts)
+- hook으로 만들어서 사용
+
+```
+import { textLeanghState, textState } from "atoms/textState";
+import { useRecoilState, useRecoilValue } from "recoil";
+
+export default function useTextInputState() {
+    const [text, setText] = useRecoilState(textState); // useRecoilState는 useState와 동일한 기능으로 사용할수 있다. textState default값에 '' 넣은값이 넘어온다.
+    const textLength = useRecoilValue(textLeanghState); // useRecoilValue는 get과 set중 get만 사용할수 있다.
+
+    const onChange = (event:React.ChangeEvent<HTMLInputElement>) => {
+        setText(event.target.value);
+    }
+    return{
+        text,
+        onChange,
+        textLength
+    }
+}
+```
+#### component (src/component/TextInput.tsx)
+```
+import useTextInputState from 'hooks/useTextInputState';
+import React from 'react';
+
+export default function TextInput() {
+    const {text, onChange,textLength} = useTextInputState(); // hook에서 꺼내온뒤 사용한다.
+    return(
+        <div>
+        <input type="text" value={text} onChange={e => onChange(e)} />
+        <br />
+        Echo: {text}
+        <br />
+        Leangh: {textLength}
+    </div>
+    );
+};
+```
