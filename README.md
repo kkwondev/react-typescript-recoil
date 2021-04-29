@@ -1,46 +1,63 @@
-# Getting Started with Create React App
+# 상태관리의 중요성
+```
+- React는 단반향으로 바인딩하는 라이브러리.
+- 부모 -> 자식 방향으로만 state 를 props로 전달할수 있음, 자식 -> 부모로 전달하는 방법은 없음.
+```
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# 자식 -> 부모로 state를 변경할수 있는 방법
+```
+1. 자식에게 부모의 state 를 변경할수 있는 setState를 props로 전달
+2. state management tool (redux,mobx,recoil) 사용
+```
 
-## Available Scripts
 
-In the project directory, you can run:
+### 1번 방식
+```
+import React, { useState } from "react";
+import Children from "./Children.js"
 
-### `yarn start`
+const Parent = () => {
+	const [name, setName] = useState('foo');
+	return(
+    	<div>
+        	<Children name={name} setName={setName}/>
+        <div />
+    );
+}
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+export default Parent;
+```
+```
+import React from "react";
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+const Children = ({name, setName}) => {
+  useEffect(()=>{
+  	setName('kkwon');
+  },[]);
+	return(
+    	<div>
+        	MY Parent's name is {name}
+        </div>
+    );
+}
 
-### `yarn test`
+export default Children;
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Recoil (src/atoms/textState.ts)
+```
+import { atom, selector } from "recoil";
 
-### `yarn build`
+export const textState = atom<string>({
+    key:'textState', // key는 이름을 정해준다. (다른 atom과 구분하기 위해)
+    default:'', // 값을 지정해준다 ex) const [text,setText] = useState('여기에 입력 하는것과 똑같다.')
+})
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+export const textLeanghState = selector({ // selector는 파생된 state를 나타낼수 있다. 원래의 state를 가져오는 것이 아닌 get 프로퍼티를 이용해 가공하여 반환한다.
+    key:'textLeanghState',
+    get:({get}) => {
+        const text = get(textState)
+        return text.length; // textState를 가공하여 length를 가져온다.
+    }
+})
+```
